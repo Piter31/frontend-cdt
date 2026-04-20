@@ -31,7 +31,7 @@ export function Footer() {
             <span className="font-display text-lg text-white">Corazón de Trufa</span>
           </div>
           <p className="text-sm text-[#e8d5c0]/70 leading-relaxed">
-            Repostería artesanal de autor.<br />Buenos Aires, Argentina.
+            Repostería artesanal.<br />Ushuaia, Tierrra del Fuego, Argentina.
           </p>
         </div>
 
