@@ -41,10 +41,10 @@ export function Navbar({ cartCount = 0 }: NavbarProps) {
 
           {/* Right side */}
           <div className="flex items-center gap-3">
-            <button className="relative p-2 rounded-full hover:bg-cream-deeper transition-colors">
-              <ShoppingBag className="w-5 h-5 text-chocolate" />
+            <button className="relative p-2 rounded-full hover:bg-[#e8d5c0] transition-colors">
+              <ShoppingBag className="w-5 h-5 text-[#2c1810]" />
               {cartCount > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-gold rounded-full text-white text-[10px] flex items-center justify-center font-bold">
+                <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-[#c4883a] rounded-full text-white text-[10px] flex items-center justify-center font-bold">
                   {cartCount}
                 </span>
               )}

@@ -43,20 +43,20 @@ export function ProductCatalog() {
     <section id="catalogo" className="py-20 px-4 max-w-7xl mx-auto">
       {/* Section header */}
       <div className="text-center mb-12">
-        <p className="text-xs font-medium text-rose-dark uppercase tracking-widest mb-3">
+        <p className="text-xs font-medium text-[#b07880] uppercase tracking-widest mb-3">
           Nuestras Creaciones
         </p>
-        <h2 className="font-display text-5xl sm:text-6xl font-light text-chocolate">
+        <h2 className="font-display text-5xl sm:text-6xl font-light text-[#2c1810]">
           El Catálogo
         </h2>
         <div className="flex items-center justify-center gap-3 mt-4">
-          <div className="h-px w-12 bg-linear-to-r from-transparent to-rose" />
-          <div className="w-1 h-1 rounded-full bg-rose" />
-          <p className="text-sm text-truffle font-light italic">
+          <div className="h-px w-12 bg-gradient-to-r from-transparent to-[#d4a0a7]" />
+          <div className="w-1 h-1 rounded-full bg-[#d4a0a7]" />
+          <p className="text-sm text-[#8b5e4a] font-light italic">
             elaborado con amor
           </p>
-          <div className="w-1 h-1 rounded-full bg-rose" />
-          <div className="h-px w-12 bg-linear-to-l from-transparent to-rose" />
+          <div className="w-1 h-1 rounded-full bg-[#d4a0a7]" />
+          <div className="h-px w-12 bg-gradient-to-l from-transparent to-[#d4a0a7]" />
         </div>
       </div>
 
@@ -64,7 +64,7 @@ export function ProductCatalog() {
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mb-8">
         {/* Search */}
         <div className="relative flex-1 max-w-sm">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-rose-dark" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#b07880]" />
           <Input
             placeholder="Buscar productos…"
             value={search}
@@ -75,11 +75,11 @@ export function ProductCatalog() {
 
         {/* Sort */}
         <div className="flex items-center gap-2">
-          <SlidersHorizontal className="w-4 h-4 text-truffle shrink-0" />
+          <SlidersHorizontal className="w-4 h-4 text-[#8b5e4a] shrink-0" />
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
-            className="text-sm border border-cream-deeper rounded-xl px-3 py-2 bg-white text-chocolate focus:outline-none focus:ring-2 focus:ring-rose"
+            className="text-sm border border-[#e8d5c0] rounded-xl px-3 py-2 bg-white text-[#2c1810] focus:outline-none focus:ring-2 focus:ring-[#d4a0a7]"
           >
             <option value="featured">Destacados</option>
             <option value="rating">Mejor calificados</option>
@@ -98,8 +98,8 @@ export function ProductCatalog() {
             className={cn(
               "shrink-0 px-4 py-2 rounded-full text-sm font-medium border transition-all",
               activeCategory === cat.value
-                ? "bg-chocolate text-cream border-chocolate shadow-sm"
-                : "bg-white text-chocolate-mid border-cream-deeper hover:border-rose hover:bg-cream-dark"
+                ? "bg-[#2c1810] text-[#faf6f0] border-[#2c1810] shadow-sm"
+                : "bg-white text-[#6b3d2a] border-[#e8d5c0] hover:border-[#d4a0a7] hover:bg-[#f2e8da]"
             )}
           >
             {cat.label}
@@ -108,7 +108,7 @@ export function ProductCatalog() {
       </div>
 
       {/* Count */}
-      <p className="text-sm text-truffle mb-6">
+      <p className="text-sm text-[#8b5e4a] mb-6">
         {filtered.length === 0
           ? "No se encontraron productos"
           : `${filtered.length} producto${filtered.length !== 1 ? "s" : ""}`}
@@ -128,10 +128,10 @@ export function ProductCatalog() {
         </div>
       ) : (
         <div className="text-center py-20">
-          <p className="font-display text-4xl text-cream-deeper">🍰</p>
-          <p className="mt-4 text-truffle">No encontramos lo que buscas</p>
+          <p className="font-display text-4xl text-[#e8d5c0]">🍰</p>
+          <p className="mt-4 text-[#8b5e4a]">No encontramos lo que buscas</p>
           <button
-            className="mt-3 text-sm text-gold hover:underline"
+            className="mt-3 text-sm text-[#c4883a] hover:underline"
             onClick={() => { setSearch(""); setActiveCategory("all"); }}
           >
             Limpiar filtros

@@ -141,7 +141,7 @@ export const PRODUCTS: Product[] = [
     rating: 4.9,
     reviewCount: 44,
     imageUrl:
-      "https://images.unsplash.com/photo-1488477181228-c84a3798bd3c?w=600&q=80",
+      "https://images.unsplash.com/photo-1564355808539-22fda35bed7e?w=600&q=80",
     category: "pies",
     tags: ["frutos rojos", "crema", "premium"],
     featured: false,

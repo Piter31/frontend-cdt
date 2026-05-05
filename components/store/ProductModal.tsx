@@ -66,7 +66,7 @@ export function ProductModal({ product, open, onOpenChange }: ProductModalProps)
                 className="object-cover"
                 sizes="(max-width: 768px) 100vw, 672px"
               />
-              <div className="absolute inset-0 bg-linear-to-t from-black/30 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
               {product.featured && (
                 <div className="absolute top-4 left-4">
                   <Badge variant="gold">⭐ Destacado</Badge>
@@ -83,10 +83,10 @@ export function ProductModal({ product, open, onOpenChange }: ProductModalProps)
                   </DialogDescription>
                 </div>
                 <div className="text-right shrink-0">
-                  <p className="font-display text-2xl font-semibold text-gold">
+                  <p className="font-display text-2xl font-semibold text-[#c4883a]">
                     ${product.price.toLocaleString("es-AR")}
                   </p>
-                  <p className="text-xs text-truffle">por unidad</p>
+                  <p className="text-xs text-[#8b5e4a]">por unidad</p>
                 </div>
               </div>
               <div className="mt-2">
@@ -96,21 +96,21 @@ export function ProductModal({ product, open, onOpenChange }: ProductModalProps)
 
             <div className="px-6 py-4 space-y-5">
               {/* Description */}
-              <p className="text-sm text-chocolate-mid leading-relaxed">{product.description}</p>
+              <p className="text-sm text-[#6b3d2a] leading-relaxed">{product.description}</p>
 
               {/* Stock */}
               <div className={cn(
                 "flex items-center gap-2 rounded-xl px-4 py-3",
-                isLowStock ? "bg-amber-50 border border-amber-200" : "bg-cream-dark"
+                isLowStock ? "bg-amber-50 border border-amber-200" : "bg-[#f2e8da]"
               )}>
                 {isLowStock ? (
                   <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
                 ) : (
-                  <Package className="w-4 h-4 text-truffle shrink-0" />
+                  <Package className="w-4 h-4 text-[#8b5e4a] shrink-0" />
                 )}
                 <span className={cn(
                   "text-sm font-medium",
-                  isLowStock ? "text-amber-700" : "text-chocolate-mid"
+                  isLowStock ? "text-amber-700" : "text-[#6b3d2a]"
                 )}>
                   {isLowStock
                     ? `¡Solo quedan ${product.stock} unidades!`
@@ -121,8 +121,8 @@ export function ProductModal({ product, open, onOpenChange }: ProductModalProps)
               {/* Ingredients */}
               <div>
                 <div className="flex items-center gap-2 mb-2">
-                  <ChefHat className="w-4 h-4 text-truffle" />
-                  <span className="text-xs font-semibold text-chocolate-mid uppercase tracking-wider">Ingredientes</span>
+                  <ChefHat className="w-4 h-4 text-[#8b5e4a]" />
+                  <span className="text-xs font-semibold text-[#6b3d2a] uppercase tracking-wider">Ingredientes</span>
                 </div>
                 <div className="flex flex-wrap gap-1.5">
                   {product.ingredients.map((ing) => (
@@ -133,7 +133,7 @@ export function ProductModal({ product, open, onOpenChange }: ProductModalProps)
 
               {/* Allergens */}
               <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-xs text-truffle font-medium">Alérgenos:</span>
+                <span className="text-xs text-[#8b5e4a] font-medium">Alérgenos:</span>
                 {product.allergens.map((al) => (
                   <Badge key={al} variant="rose" className="text-xs">{al}</Badge>
                 ))}
@@ -141,7 +141,7 @@ export function ProductModal({ product, open, onOpenChange }: ProductModalProps)
             </div>
 
             {/* Quantity + CTA */}
-            <div className="px-6 pb-6 border-t border-cream-deeper pt-4 flex flex-col sm:flex-row items-center gap-4">
+            <div className="px-6 pb-6 border-t border-[#e8d5c0] pt-4 flex flex-col sm:flex-row items-center gap-4">
               <div className="flex items-center gap-3">
                 <Button
                   variant="outline"
@@ -151,7 +151,7 @@ export function ProductModal({ product, open, onOpenChange }: ProductModalProps)
                 >
                   <Minus className="w-4 h-4" />
                 </Button>
-                <span className="w-8 text-center font-display text-xl font-semibold text-chocolate">
+                <span className="w-8 text-center font-display text-xl font-semibold text-[#2c1810]">
                   {quantity}
                 </span>
                 <Button
@@ -164,7 +164,7 @@ export function ProductModal({ product, open, onOpenChange }: ProductModalProps)
                 </Button>
               </div>
               <Button
-                className="flex-1 w-full sm:w-auto shadow-lg shadow-chocolate/20 hover:-translate-y-0.5"
+                className="flex-1 w-full sm:w-auto shadow-lg shadow-[#2c1810]/20 hover:-translate-y-0.5"
                 size="lg"
                 onClick={() => setStep("payment")}
               >
@@ -177,19 +177,19 @@ export function ProductModal({ product, open, onOpenChange }: ProductModalProps)
 
         {step === "payment" && (
           <div className="p-8 flex flex-col items-center text-center gap-6">
-            <div className="w-16 h-16 rounded-full bg-cream-deeper flex items-center justify-center">
-              <QrCode className="w-8 h-8 text-chocolate" />
+            <div className="w-16 h-16 rounded-full bg-[#e8d5c0] flex items-center justify-center">
+              <QrCode className="w-8 h-8 text-[#2c1810]" />
             </div>
             <div>
-              <h2 className="font-display text-3xl font-semibold text-chocolate">Método de Pago</h2>
-              <p className="text-truffle mt-1 text-sm">
+              <h2 className="font-display text-3xl font-semibold text-[#2c1810]">Método de Pago</h2>
+              <p className="text-[#8b5e4a] mt-1 text-sm">
                 {quantity}x {product.name} · Total:{" "}
-                <strong className="text-gold">${total.toLocaleString("es-AR")}</strong>
+                <strong className="text-[#c4883a]">${total.toLocaleString("es-AR")}</strong>
               </p>
             </div>
 
             {/* Fake QR code */}
-            <div className="relative border-4 border-chocolate rounded-2xl p-3 bg-white">
+            <div className="relative border-4 border-[#2c1810] rounded-2xl p-3 bg-white">
               <div className="w-40 h-40 grid grid-cols-7 gap-0.5">
                 {Array.from({ length: 49 }).map((_, i) => {
                   const corners = [0,1,2,3,4,5,6,7,13,14,20,21,27,28,34,35,41,42,43,44,45,46,47,48];
@@ -202,18 +202,18 @@ export function ProductModal({ product, open, onOpenChange }: ProductModalProps)
                       key={i}
                       className={cn(
                         "rounded-sm",
-                        (isCorner || isCenter || isRandom) ? "bg-chocolate" : "bg-white"
+                        (isCorner || isCenter || isRandom) ? "bg-[#2c1810]" : "bg-white"
                       )}
                     />
                   );
                 })}
               </div>
-              <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 bg-cream px-2">
-                <span className="text-xs text-truffle font-mono">CDT-{product.id}{quantity}0{Math.floor(Math.random()*9)}</span>
+              <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 bg-[#faf6f0] px-2">
+                <span className="text-xs text-[#8b5e4a] font-mono">CDT-{product.id}{quantity}0{Math.floor(Math.random()*9)}</span>
               </div>
             </div>
 
-            <p className="text-xs text-truffle max-w-xs">
+            <p className="text-xs text-[#8b5e4a] max-w-xs">
               Escaneá el código con MercadoPago, Uala o tu app bancaria para completar el pago.
             </p>
 
@@ -234,14 +234,14 @@ export function ProductModal({ product, open, onOpenChange }: ProductModalProps)
               <CheckCircle2 className="w-10 h-10 text-green-600" />
             </div>
             <div>
-              <h2 className="font-display text-3xl font-semibold text-chocolate">¡Pedido Confirmado!</h2>
-              <p className="text-truffle mt-2 leading-relaxed">
+              <h2 className="font-display text-3xl font-semibold text-[#2c1810]">¡Pedido Confirmado!</h2>
+              <p className="text-[#8b5e4a] mt-2 leading-relaxed">
                 Gracias por tu compra. Te contactaremos por WhatsApp en los próximos minutos
                 para coordinar la entrega de tu{" "}
-                <strong className="text-chocolate">{product.name}</strong>.
+                <strong className="text-[#2c1810]">{product.name}</strong>.
               </p>
             </div>
-            <div className="bg-cream-dark rounded-2xl p-4 w-full text-sm text-chocolate-mid">
+            <div className="bg-[#f2e8da] rounded-2xl p-4 w-full text-sm text-[#6b3d2a]">
               <p>🍫 Pedido: {quantity}x {product.name}</p>
               <p className="mt-1">💰 Total abonado: <strong>${total.toLocaleString("es-AR")}</strong></p>
             </div>

@@ -22,19 +22,19 @@ export function Hero() {
         <div className="w-16 h-16 rounded-full bg-white border border-[#e8d5c0] shadow-sm flex items-center justify-center text-2xl">🍰</div>
       </div>
       <div className="absolute bottom-52 left-[12%] animate-float" style={{ animationDelay: "2s" }}>
-        <div className="w-10 h-10 rounded-full bg-white border border-cream-deeper shadow-sm flex items-center justify-center text-lg">✨</div>
+        <div className="w-10 h-10 rounded-full bg-white border border-[#e8d5c0] shadow-sm flex items-center justify-center text-lg">✨</div>
       </div>
 
       {/* Main content */}
       <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
         {/* Badge */}
         <div
-          className="inline-flex items-center gap-2 bg-white border border-cream-deeper rounded-full px-4 py-2 mb-8 shadow-sm opacity-0 animate-fade-in-up"
+          className="inline-flex items-center gap-2 bg-white border border-[#e8d5c0] rounded-full px-4 py-2 mb-8 shadow-sm opacity-0 animate-fade-in-up"
           style={{ animationDelay: "0.1s", animationFillMode: "forwards" }}
         >
           <Sparkles className="w-3.5 h-3.5 text-[#c4883a]" />
-          <span className="text-xs font-medium text-chocolate-mid tracking-wider uppercase">
-            Repostería Artesanal · Ushuaia - Tierra del Fuego
+          <span className="text-xs font-medium text-[#6b3d2a] tracking-wider uppercase">
+            Repostería Artesanal · Buenos Aires
           </span>
         </div>
 
