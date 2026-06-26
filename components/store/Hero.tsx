@@ -34,7 +34,7 @@ export function Hero() {
         >
           <Sparkles className="w-3.5 h-3.5 text-[#c4883a]" />
           <span className="text-xs font-medium text-[#6b3d2a] tracking-wider uppercase">
-            Repostería Artesanal · Buenos Aires
+            Repostería Artesanal · Tierra del Fuego - Ushuaia
           </span>
         </div>
 
@@ -104,8 +104,8 @@ export function Hero() {
         >
           {[
             { value: "100%", label: "Artesanal" },
-            { value: "8+", label: "Variedades" },
-            { value: "500+", label: "Clientes felices" },
+            { value: "6+", label: "Variedades" },
+            { value: "300+", label: "Clientes felices" },
           ].map((stat) => (
             <div key={stat.label} className="text-center">
               <p className="font-display text-2xl font-semibold text-[#2c1810]">

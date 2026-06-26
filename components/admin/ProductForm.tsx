@@ -1,11 +1,14 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { type Product, PRODUCTS } from "@/constants/data";
-import { X, Save, PlusCircle } from "lucide-react";
+import { X, Save, PlusCircle, AlertCircle, CheckCircle2 } from "lucide-react";
+
+import { Product } from "@/lib/product";
+import { createProduct, updateProduct } from "@/app/services/products.service";
 
 interface ProductFormProps {
   product?: Product | null;
@@ -13,18 +16,20 @@ interface ProductFormProps {
   onCancel: () => void;
 }
 
-const EMPTY_FORM = {
-  name: "",
-  shortDescription: "",
-  description: "",
-  price: "",
-  costPrice: "",
-  stock: "",
-  category: "cookies" as Product["category"],
-  imageUrl: "",
-};
+// const EMPTY_FORM = {
+//   name: "",
+//   description: "",
+//   shortDescription: "",
+//   price: "",
+//   costPrice: "",
+//   stock: "",
+//   category: "cookies" as Product["category"],
+//   imageUrl: "",
+// };
+
 
 export function ProductForm({ product, onSave, onCancel }: ProductFormProps) {
+  const router = useRouter();
   const [form, setForm] = useState({
     name: product?.name ?? "",
     shortDescription: product?.shortDescription ?? "",
@@ -37,6 +42,8 @@ export function ProductForm({ product, onSave, onCancel }: ProductFormProps) {
   });
 
   const [errors, setErrors] = useState<Partial<typeof form>>({});
+  const [loading, setLoading] = useState(false);
+  const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
   function validate() {
     const e: Partial<typeof form> = {};
@@ -48,29 +55,87 @@ export function ProductForm({ product, onSave, onCancel }: ProductFormProps) {
     return Object.keys(e).length === 0;
   }
 
-  function handleSubmit() {
+  //ENVIA Y VERIFICA LOS DATOS DEL FORMULARIO 
+  const handleSubmit = async () => {
     if (!validate()) return;
-    onSave({
-      id: product?.id ?? String(Date.now()),
-      name: form.name.trim(),
-      shortDescription: form.shortDescription.trim() || form.name,
-      description: form.description.trim() || form.shortDescription,
-      price: Number(form.price),
-      costPrice: Number(form.costPrice),
-      stock: Number(form.stock),
-      category: form.category,
-      imageUrl:
-        form.imageUrl.trim() ||
-        "https://images.unsplash.com/photo-1464349095431-e9a21285b5f3?w=600&q=80",
-      rating: product?.rating ?? 5.0,
-      reviewCount: product?.reviewCount ?? 0,
-      sold: product?.sold ?? 0,
-      tags: [],
-      featured: false,
-      ingredients: [],
-      allergens: [],
-    });
+    setLoading(true);
+    setFeedback(null);
+    try {
+      const productData = {
+        name: form.name.trim(),
+        shortDescription: form.shortDescription.trim() || form.name,
+        description: form.description.trim() || form.shortDescription,
+        price: Number(form.price),
+        costPrice: Number(form.costPrice),
+        stock: Number(form.stock),
+        category: form.category,
+        imageUrl:
+          form.imageUrl.trim() ||
+          "https://images.unsplash.com/photo-1464349095431-e9a21285b5f3?w=600&q=80",
+        rating: product?.rating ?? 5.0,
+        reviewCount: product?.reviewCount ?? 0,
+        sold: product?.sold ?? 0,
+        tags: product?.tags ?? [],
+        featured: product?.featured ?? false,
+        ingredients: product?.ingredients ?? [],
+        allergens: product?.allergens ?? [],
+      };
+
+      let result;
+      if (product?.id) {
+        // Actualizar producto existente
+        result = await updateProduct(product.id, productData);
+      } else {
+        // Crear nuevo producto
+        result = await createProduct(productData);
+      }
+      
+      setFeedback({
+        type: 'success',
+        message: product ? 'Producto actualizado exitosamente' : 'Producto creado exitosamente'
+      });
+      
+      // Llamar callback y limpiar después de 1.5s
+      setTimeout(() => {
+        onSave(result);
+        onCancel();
+      }, 1500);
+    }catch (error: any) {
+      console.error('Error al guardar producto:', error);
+      const errorMessage = error.response?.data?.message || error.message || 'Error al guardar el producto';
+      setFeedback({
+        type: 'error',
+        message: errorMessage
+      });
+    }finally {
+      setLoading(false);
+    }
   }
+
+
+  // function handleSubmit() {
+  //   if (!validate()) return;
+  //   onSave({
+  //     id: product?.id ?? String(Date.now()),
+  //     name: form.name.trim(),
+  //     shortDescription: form.shortDescription.trim() || form.name,
+  //     description: form.description.trim() || form.shortDescription,
+  //     price: Number(form.price),
+  //     costPrice: Number(form.costPrice),
+  //     stock: Number(form.stock),
+  //     category: form.category,
+  //     imageUrl:
+  //       form.imageUrl.trim() ||
+  //       "https://images.unsplash.com/photo-1464349095431-e9a21285b5f3?w=600&q=80",
+  //     rating: product?.rating ?? 5.0,
+  //     reviewCount: product?.reviewCount ?? 0,
+  //     sold: product?.sold ?? 0,
+  //     tags: [],
+  //     featured: false,
+  //     ingredients: [],
+  //     allergens: [],
+  //   });
+  // }
 
   const margin =
     form.price && form.costPrice
@@ -78,8 +143,7 @@ export function ProductForm({ product, onSave, onCancel }: ProductFormProps) {
           ((Number(form.price) - Number(form.costPrice)) /
             Number(form.price)) *
             100
-        )
-      : null;
+        ): null;
 
   return (
     <div className="bg-white rounded-2xl border border-[#e8d5c0] p-6 shadow-sm">
@@ -92,12 +156,6 @@ export function ProductForm({ product, onSave, onCancel }: ProductFormProps) {
             {product ? `Editando: ${product.name}` : "Completá los campos para agregar"}
           </p>
         </div>
-        <button
-          onClick={onCancel}
-          className="p-2 rounded-xl hover:bg-[#f2e8da] text-[#8b5e4a] transition-colors"
-        >
-          <X className="w-4 h-4" />
-        </button>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -180,10 +238,9 @@ export function ProductForm({ product, onSave, onCancel }: ProductFormProps) {
             className="flex h-10 w-full rounded-xl border border-[#e8d5c0] bg-white px-4 py-2 text-sm text-[#2c1810] focus:outline-none focus:ring-2 focus:ring-[#d4a0a7]"
           >
             <option value="cookies">Cookies & Alfajores</option>
-            <option value="pies">Tartas & Pies</option>
-            <option value="cakes">Pasteles</option>
-            <option value="pastries">Facturas</option>
+            <option value="pies">Tartas</option>
             <option value="chocolates">Chocolates</option>
+            <option value="otros">Otros</option>
           </select>
         </div>
 
@@ -209,13 +266,49 @@ export function ProductForm({ product, onSave, onCancel }: ProductFormProps) {
         )}
       </div>
 
+      {/* Feedback message */}
+      {feedback && (
+        <div className={`mt-6 p-4 rounded-xl flex items-start gap-3 ${
+          feedback.type === 'success'
+            ? 'bg-green-50 border border-green-200'
+            : 'bg-red-50 border border-red-200'
+        }`}>
+          {feedback.type === 'success' ? (
+            <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+          ) : (
+            <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+          )}
+          <p className={`text-sm ${
+            feedback.type === 'success'
+              ? 'text-green-700'
+              : 'text-red-700'
+          }`}>
+            {feedback.message}
+          </p>
+        </div>
+      )}
+
       {/* Actions */}
       <div className="flex gap-3 mt-6 pt-5 border-t border-[#e8d5c0]">
-        <Button variant="outline" onClick={onCancel} className="flex-1">
+        <Button 
+          variant="outline" 
+          onClick={onCancel} 
+          className="flex-1"
+          disabled={loading}
+        >
           Cancelar
         </Button>
-        <Button onClick={handleSubmit} className="flex-1 shadow-sm">
-          {product ? (
+        <Button 
+          onClick={handleSubmit} 
+          className="flex-1 shadow-sm"
+          disabled={loading}
+        >
+          {loading ? (
+            <>
+              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              {product ? 'Guardando...' : 'Creando...'}
+            </>
+          ) : product ? (
             <><Save className="w-4 h-4" /> Guardar Cambios</>
           ) : (
             <><PlusCircle className="w-4 h-4" /> Agregar Producto</>

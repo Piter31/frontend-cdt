@@ -1,25 +1,76 @@
 "use client";
 
-import { useState } from "react";
-import { PRODUCTS, type Product } from "@/constants/data";
+// import React from 'react';
+import { useState, useEffect } from "react";
+// import { PRODUCTS, type Product } from "@/constants/data";
 import { MetricsCards } from "@/components/admin/MetricsCards";
 import { ProductTable } from "@/components/admin/ProductTable";
-import { ProductForm } from "@/components/admin/ProductForm";
+import { ProductFormModal } from "@/components/admin/ProductFormModal";
 import { Button } from "@/components/ui/button";
 import { PlusCircle, Bell, RefreshCw } from "lucide-react";
 
+import { Product } from "@/lib/product";
+import { getProducts } from "../services/products.service";
+
 export default function AdminPage() {
-  const [products, setProducts] = useState<Product[]>(PRODUCTS);
+  const [products, setProducts] = useState<Product[]>([]);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [notification, setNotification] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [timeStr, setTimeStr] = useState<string>("");
+  const [dateStr, setDateStr] = useState<string>("");
+
+  // Cargar productos desde la base de datos
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const dataProduct = await getProducts();
+        // Asegurar que data es un array
+        // const productsArray = Array.isArray(data) ? data : (data?.items || data?.data || []);
+        setProducts(dataProduct);
+      } catch (err) {
+        const errorMsg = err instanceof Error ? err.message : 'Error al cargar productos';
+        setError(errorMsg);
+        console.error('Error fetching products:', err);
+        showNotif(`⚠️ Error: ${errorMsg}`);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    // Actualizar fecha y hora en el cliente
+    const updateDateTime = () => {
+      const now = new Date();
+      setTimeStr(
+        now.toLocaleTimeString("es-AR", {
+          hour: "2-digit",
+          minute: "2-digit",
+        })
+      );
+      setDateStr(
+        now.toLocaleDateString("es-AR", {
+          weekday: "long",
+          day: "numeric",
+          month: "long",
+        })
+      );
+    };
+
+    updateDateTime();
+    fetchProducts();
+  }, []);
+
 
   function showNotif(msg: string) {
     setNotification(msg);
     setTimeout(() => setNotification(null), 3000);
   }
 
-  function handleSave(data: Partial<Product>) {
+  async function handleSave(data: Partial<Product>) {
     if (editingProduct) {
       setProducts((prev) =>
         prev.map((p) =>
@@ -35,18 +86,28 @@ export default function AdminPage() {
     setEditingProduct(null);
   }
 
+  // Editar producto: abre el formulario con los datos del producto seleccionado
   function handleEdit(product: Product) {
     setEditingProduct(product);
     setShowForm(true);
-    window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
+  // Eliminar producto: actualiza el estado (la API ya fue llamada desde ProductTable)
   function handleDelete(id: string) {
-    const product = products.find((p) => p.id === id);
-    if (window.confirm(`¿Eliminar "${product?.name}"?`)) {
-      setProducts((prev) => prev.filter((p) => p.id !== id));
-      showNotif(`"${product?.name}" eliminado del inventario`);
-    }
+    const product = (products || []).find((p) => p.id === id);
+    setProducts((prev) => [...(prev || []).filter((p) => p.id !== id)]);
+    showNotif(`"${product?.name}" eliminado del inventario`);
+  }
+
+  // Alternar estado de producto
+  function handleToggle(product: Product) {
+    setProducts((prev) =>
+      prev.map((p) =>
+        p.id === product.id ? { ...p, active: product.active } : p
+      )
+    );
+    const status = product.active ? "activado" : "desactivado";
+    showNotif(`"${product.name}" ${status} correctamente`);
   }
 
   function handleCancel() {
@@ -54,16 +115,22 @@ export default function AdminPage() {
     setEditingProduct(null);
   }
 
-  const now = new Date();
-  const timeStr = now.toLocaleTimeString("es-AR", {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-  const dateStr = now.toLocaleDateString("es-AR", {
-    weekday: "long",
-    day: "numeric",
-    month: "long",
-  });
+  // Función para refrescar los productos desde el backend
+  async function handleRefresh() {
+    try {
+      setLoading(true);
+      setError(null);
+      const data = await getProducts();
+      setProducts(data);
+      showNotif(`✓ Datos actualizados (${data.length} productos)`);
+    } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : 'Error al refrescar';
+      setError(errorMsg);
+      showNotif(`⚠️ Error: ${errorMsg}`);
+    } finally {
+      setLoading(false);
+    }
+  }
 
   return (
     <div className="flex-1 flex flex-col">
@@ -107,14 +174,13 @@ export default function AdminPage() {
         {/* Metrics */}
         <MetricsCards />
 
-        {/* Form */}
-        {showForm && (
-          <ProductForm
-            product={editingProduct}
-            onSave={handleSave}
-            onCancel={handleCancel}
-          />
-        )}
+        {/* Form Modal */}
+        <ProductFormModal
+          isOpen={showForm}
+          product={editingProduct}
+          onSave={handleSave}
+          onCancel={handleCancel}
+        />
 
         {/* Quick stats bar */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
@@ -126,19 +192,21 @@ export default function AdminPage() {
             },
             {
               label: "En stock crítico",
-              value: products.filter((p) => p.stock <= 5).length,
+              value: Object.values(products).filter((p) => p.stock <= 5).length,
               icon: "⚠️",
             },
             {
               label: "Más vendido",
               value:
-                products.sort((a, b) => b.sold - a.sold)[0]?.name.split(" ").slice(0, 2).join(" ") ?? "—",
+                products.length > 0 
+                  ? products.sort((a, b) => b.sold - a.sold)[0]?.name.split(" ").slice(0, 2).join(" ") ?? "—"
+                  : "—",
               icon: "🏆",
               isText: true,
             },
             {
               label: "Categorías",
-              value: new Set(products.map((p) => p.category)).size,
+              value: new Set(Object.values(products).map((p) => p.category)).size,
               icon: "🗂️",
             },
           ].map((item) => (
@@ -166,18 +234,42 @@ export default function AdminPage() {
               Gestión de Inventario
             </h2>
             <button
-              onClick={() => setProducts(PRODUCTS)}
-              className="flex items-center gap-1.5 text-xs text-[#8b5e4a] hover:text-[#2c1810] transition-colors"
+              onClick={handleRefresh}
+              disabled={loading}
+              className="flex items-center gap-1.5 text-xs text-[#8b5e4a] hover:text-[#2c1810] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <RefreshCw className="w-3.5 h-3.5" />
-              Resetear datos
+              <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
+              {loading ? 'Cargando...' : 'Refrescar datos'}
             </button>
           </div>
-          <ProductTable
+          {error && (
+            <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+              Error: {error}
+            </div>
+          )}
+          {!loading && products.length === 0 && !error && (
+            <div className="text-center py-8 text-[#8b5e4a]">
+              <p>No hay productos. Crea uno nuevo o verifica tu conexión al backend.</p>
+            </div>
+          )}
+          {products.length > 0 && (
+            <ProductTable
             products={products}
             onEdit={handleEdit}
             onDelete={handleDelete}
-          />
+            onToggle={handleToggle}
+            // key={product.id}
+            />
+          )}
+          {/* {products.map((product) => (
+            <ProductTable
+              products={products}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+              onToggle={handleToggle}
+              key={product.id}
+            />
+          ))} */}
         </div>
 
         {/* Mini chart: top sellers */}
@@ -186,36 +278,42 @@ export default function AdminPage() {
             Productos más vendidos
           </h3>
           <div className="space-y-3">
-            {[...products]
-              .sort((a, b) => b.sold - a.sold)
-              .slice(0, 5)
-              .map((product, i) => {
-                const max = Math.max(...products.map((p) => p.sold));
-                const pct = (product.sold / max) * 100;
-                return (
-                  <div key={product.id} className="flex items-center gap-3">
-                    <span className="text-xs text-[#8b5e4a] w-4 text-right font-medium">
-                      {i + 1}
-                    </span>
-                    <div className="flex-1">
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="text-sm font-medium text-[#2c1810] truncate max-w-[160px]">
-                          {product.name}
-                        </span>
-                        <span className="text-sm font-semibold text-[#c4883a]">
-                          {product.sold}
-                        </span>
-                      </div>
-                      <div className="h-2 rounded-full bg-[#f2e8da] overflow-hidden">
-                        <div
-                          className="h-full rounded-full bg-gradient-to-r from-[#c4883a] to-[#e0a84e] transition-all duration-700"
-                          style={{ width: `${pct}%` }}
-                        />
+            {products.length > 0 ? (
+              products
+                .sort((a, b) => b.sold - a.sold)
+                .slice(0, 6)
+                .map((product, i) => {
+                  const max = Math.max(...products.map((p) => p.sold), 1);
+                  const pct = (product.sold / max) * 100;
+                  return (
+                    <div key={product.id} className="flex items-center gap-3">
+                      <span className="text-xs text-[#8b5e4a] w-4 text-right font-medium">
+                        {i + 1}
+                      </span>
+                      <div className="flex-1">
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-sm font-medium text-[#2c1810] truncate max-w-[160px]">
+                            {product.name}
+                          </span>
+                          <span className="text-sm font-semibold text-[#c4883a]">
+                            {product.sold}
+                          </span>
+                        </div>
+                        <div className="h-2 rounded-full bg-[#f2e8da] overflow-hidden">
+                          <div
+                            className="h-full rounded-full bg-gradient-to-r from-[#c4883a] to-[#e0a84e] transition-all duration-700"
+                            style={{ width: `${pct}%` }}
+                          />
+                        </div>
                       </div>
                     </div>
-                  </div>
-                );
-              })}
+                  );
+                })
+            ) : (
+              <p className="text-center text-[#8b5e4a] text-sm py-4">
+                Sin datos de ventas disponibles
+              </p>
+            )}
           </div>
         </div>
       </main>

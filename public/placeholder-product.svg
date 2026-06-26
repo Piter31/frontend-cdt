@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400">
+  <defs>
+    <style>
+      .placeholder-bg { fill: #f2e8da; }
+      .placeholder-text { fill: #b07880; font-family: Arial, sans-serif; font-size: 18px; text-anchor: middle; }
+      .placeholder-icon { fill: #e8d5c0; }
+    </style>
+  </defs>
+  <rect class="placeholder-bg" width="400" height="400"/>
+  <g class="placeholder-icon">
+    <path d="M200 120 Q180 100 160 100 Q140 100 130 120 Q120 140 130 160 Q140 180 160 180 Q180 180 200 160 Q220 180 240 180 Q260 180 270 160 Q280 140 270 120 Q260 100 240 100 Q220 100 200 120 Z"/>
+    <path d="M150 220 Q130 200 110 200 Q90 200 80 220 Q70 240 80 260 Q90 280 110 280 Q130 280 150 260 Q170 280 190 280 Q210 280 220 260 Q230 240 220 220 Q210 200 190 200 Q170 200 150 220 Z"/>
+    <path d="M250 220 Q230 200 210 200 Q190 200 180 220 Q170 240 180 260 Q190 280 210 280 Q230 280 250 260 Q270 280 290 280 Q310 280 320 260 Q330 240 320 220 Q310 200 290 200 Q270 200 250 220 Z"/>
+  </g>
+  <text class="placeholder-text" x="200" y="360">Sin imagen disponible</text>
+</svg>

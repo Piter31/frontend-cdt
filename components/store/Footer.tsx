@@ -1,4 +1,5 @@
-import { Heart, AtSign, MessageCircle } from "lucide-react";
+import { Heart } from "lucide-react";
+import { FaInstagram, FaWhatsapp } from "react-icons/fa";
 
 export function Footer() {
   return (
@@ -13,7 +14,7 @@ export function Footer() {
             Hechos con <span className="italic text-[#c4883a]">pasión</span>
           </h2>
           <p className="text-[#e8d5c0]/80 leading-relaxed text-lg max-w-2xl mx-auto">
-            Corazón de Trufa nació del amor por la repostería francesa y la
+            Corazón de Trufa nació del amor por la repostería y la
             tradición pastelera argentina. Cada pieza que elaboramos lleva
             ingredientes de primera calidad, técnica y, sobre todo, el cariño
             de quienes la hacen.
@@ -31,7 +32,7 @@ export function Footer() {
             <span className="font-display text-lg text-white">Corazón de Trufa</span>
           </div>
           <p className="text-sm text-[#e8d5c0]/70 leading-relaxed">
-            Repostería artesanal de autor.<br />Buenos Aires, Argentina.
+            Repostería artesanal.<br />Ushuaia · Tierra del Fuego, Argentina.
           </p>
         </div>
 
@@ -43,7 +44,7 @@ export function Footer() {
           <ul className="space-y-2 text-sm text-[#e8d5c0]/70">
             <li><a href="#catalogo" className="hover:text-[#d4a0a7] transition-colors">Catálogo</a></li>
             <li><a href="#nosotros" className="hover:text-[#d4a0a7] transition-colors">Nosotros</a></li>
-            <li><a href="/admin" className="hover:text-[#d4a0a7] transition-colors">Administración</a></li>
+            {/* <li><a href="/admin" className="hover:text-[#d4a0a7] transition-colors">Administración</a></li> */}
           </ul>
         </div>
 
@@ -57,15 +58,15 @@ export function Footer() {
               href="https://wa.me/5491100000000"
               className="flex items-center gap-2.5 text-sm text-[#e8d5c0]/70 hover:text-[#d4a0a7] transition-colors"
             >
-              <MessageCircle className="w-4 h-4 shrink-0" />
+              <FaWhatsapp className="w-4 h-4 shrink-0" />
               WhatsApp: +54 9 11 0000-0000
             </a>
             <a
-              href="https://instagram.com"
+              href="https://www.instagram.com/corazonde.trufa/"
               className="flex items-center gap-2.5 text-sm text-[#e8d5c0]/70 hover:text-[#d4a0a7] transition-colors"
             >
-              <AtSign className="w-4 h-4 shrink-0" />
-              @corazon.de.trufa
+              <FaInstagram className="w-4 h-4 shrink-0"/>
+              @corazonde.trufa
             </a>
           </div>
         </div>
@@ -74,9 +75,7 @@ export function Footer() {
       {/* Bottom bar */}
       <div className="border-t border-white/10 py-5 px-4">
         <p className="text-center text-xs text-[#e8d5c0]/40 flex items-center justify-center gap-1.5">
-          © 2025 Corazón de Trufa · Hecho con
-          <Heart className="w-3 h-3 text-[#d4a0a7] fill-[#d4a0a7]" />
-          en Buenos Aires
+          © 2026 · Corazón de Trufa <Heart className="w-3 h-3 text-[#c4883a]"/>· Version Beta 0.1
         </p>
       </div>
     </footer>

@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { ShoppingBag } from "lucide-react";
-import { type Product } from "@/constants/data";
+import { type Product } from "@/lib/product";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { StarRating } from "@/components/store/StarRating";
@@ -25,13 +25,13 @@ export function ProductCard({ product, onSelect, style }: ProductCardProps) {
       onClick={() => !isOutOfStock && onSelect(product)}
     >
       {/* Image wrapper with zoom */}
-      <div className="product-image-wrapper relative h-52 w-full bg-[#f2e8da]">
+      <div className="product-image-wrapper relative h-52 w-full bg-[#f2e8da] overflow-hidden">
         <Image
-          src={product.imageUrl}
+          src={product.imageUrl || "/placeholder-product.svg"}
           alt={product.name}
           fill
-          className="object-cover"
-          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+          className="w-full h-full object-cover"
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
         />
 
         {/* Overlay on hover */}
@@ -72,10 +72,8 @@ export function ProductCard({ product, onSelect, style }: ProductCardProps) {
       <div className="p-4 space-y-3">
         <div>
           <p className="text-[10px] font-medium text-[#b07880] uppercase tracking-wider mb-1">
-            {product.category === "cookies" && "Cookies & Alfajores"}
-            {product.category === "pies" && "Tartas & Pies"}
-            {product.category === "cakes" && "Pasteles"}
-            {product.category === "pastries" && "Facturas"}
+            {product.category === "cookies & alfajores" && "Cookies & Alfajores"}
+            {product.category === "tartas" && "Tartas"}
             {product.category === "chocolates" && "Chocolates"}
           </p>
           <h3 className="font-display text-lg font-semibold text-[#2c1810] leading-tight line-clamp-1">
@@ -96,7 +94,7 @@ export function ProductCard({ product, onSelect, style }: ProductCardProps) {
             )}>
               ${product.price.toLocaleString("es-AR")}
             </p>
-            <p className="text-[10px] text-[#8b5e4a]">{product.stock} disponibles</p>
+            <p className="text-[13px] text-[#8b5e4a]">{product.stock} disponibles</p>
           </div>
           <Button
             size="sm"

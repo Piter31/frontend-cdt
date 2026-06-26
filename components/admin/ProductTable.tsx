@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { type Product } from "@/constants/data";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -14,22 +13,36 @@ import {
   ChevronDown,
   AlertTriangle,
   TrendingUp,
+  LucideTrash2,
+  ToggleLeft,
+  ToggleRight,
+  Key,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+
+import { Product } from "@/lib/product";
+import { DeleteConfirmationModal } from "./DeleteConfirmationModal";
+import { deleteProduct, toggleProductStatus } from "@/app/services/products.service";
+// import { getProducts } from "@/app/services/products.service";
 
 interface ProductTableProps {
   products: Product[];
   onEdit: (product: Product) => void;
   onDelete: (id: string) => void;
+  onToggle?: (product: Product) => void;
 }
 
-type SortField = "name" | "price" | "stock" | "sold" | "margin";
+type SortField = "name" | "price" | "costPrice"| "stock" | "sold" | "margin";
 type SortDir = "asc" | "desc";
 
-export function ProductTable({ products, onEdit, onDelete }: ProductTableProps) {
+export function ProductTable({ products, onEdit, onDelete, onToggle }: ProductTableProps) {
   const [search, setSearch] = useState("");
   const [sortField, setSortField] = useState<SortField>("name");
   const [sortDir, setSortDir] = useState<SortDir>("asc");
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [selectedProductForDelete, setSelectedProductForDelete] = useState<Product | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isTogglingProduct, setIsTogglingProduct] = useState<string | null>(null);
 
   function toggleSort(field: SortField) {
     if (sortField === field) {
@@ -40,20 +53,64 @@ export function ProductTable({ products, onEdit, onDelete }: ProductTableProps) 
     }
   }
 
+  // Abrir modal de confirmación de eliminación
+  function handleDeleteClick(product: Product) {
+    setSelectedProductForDelete(product);
+    setDeleteModalOpen(true);
+  }
+
+  // Confirmar eliminación
+  function handleConfirmDelete() {
+    if (!selectedProductForDelete) return;
+
+    // El DeleteConfirmationModal ya realizó la eliminación permanente
+    // Solo actualizamos la UI
+    onDelete(selectedProductForDelete.id);
+    setDeleteModalOpen(false);
+    setSelectedProductForDelete(null);
+  }
+
+  // Cancelar eliminación
+  function handleCancelDelete() {
+    setDeleteModalOpen(false);
+    setSelectedProductForDelete(null);
+  }
+
+  // Alternar activación/desactivación de producto (soft delete)
+  async function handleToggleProduct(product: Product) {
+    setIsTogglingProduct(product.id);
+    try {
+      const newActiveState = !product.active;
+      await toggleProductStatus(product.id, newActiveState);
+      if (onToggle) {
+        onToggle({ ...product, active: newActiveState });
+      }
+    } catch (error: any) {
+      console.error("Error al alternar producto:", error);
+      alert("Error al cambiar el estado del producto. Intenta nuevamente.");
+    } finally {
+      setIsTogglingProduct(null);
+    }
+  }
+
   const filtered = products
     .filter((p) =>
-      p.name.toLowerCase().includes(search.toLowerCase())
+      (p.name || '').toLowerCase().includes(search.toLowerCase())
     )
     .sort((a, b) => {
-      let valA: string | number = a.name;
-      let valB: string | number = b.name;
+      let valA: string | number = a.name || '';
+      let valB: string | number = b.name || '';
 
-      if (sortField === "price") { valA = a.price; valB = b.price; }
-      else if (sortField === "stock") { valA = a.stock; valB = b.stock; }
-      else if (sortField === "sold") { valA = a.sold; valB = b.sold; }
+      if (sortField === "price") { valA = a.price || 0; valB = b.price || 0; }
+      else if (sortField === "stock") { valA = a.stock || 0; valB = b.stock || 0; }
+      else if (sortField === "sold") { valA = a.sold || 0; valB = b.sold || 0; }
       else if (sortField === "margin") {
-        valA = ((a.price - a.costPrice) / a.price) * 100;
-        valB = ((b.price - b.costPrice) / b.price) * 100;
+        const priceA = a.price || 0;
+        const costA = a.costPrice || 0;
+        const priceB = b.price || 0;
+        const costB = b.costPrice || 0;
+        valA = priceA > 0 ? ((priceA - costA) / priceA) * 100 : 0;
+        valB = priceB > 0 ? ((priceB - costB) / priceB) * 100 : 0;
       }
 
       if (typeof valA === "string") {
@@ -113,11 +170,12 @@ export function ProductTable({ products, onEdit, onDelete }: ProductTableProps) 
               <th className="text-left px-4 py-3 text-xs font-semibold text-[#8b5e4a] uppercase tracking-wider">
                 Producto
               </th>
-              <th className="text-right px-4 py-3 text-xs font-semibold text-[#8b5e4a] uppercase tracking-wider">
+              <th className="text-right px-4 py-3 text-xs font-semibold text-[#8b5e4a] 
+              uppercase tracking-wider">
                 <SortableHeader field="price" label="P. Venta" />
               </th>
               <th className="text-right px-4 py-3 text-xs font-semibold text-[#8b5e4a] uppercase tracking-wider">
-                P. Costo
+                <SortableHeader field="costPrice" label="P. Costo" />
               </th>
               <th className="text-right px-4 py-3 text-xs font-semibold text-[#8b5e4a] uppercase tracking-wider">
                 <SortableHeader field="margin" label="Margen" />
@@ -128,6 +186,7 @@ export function ProductTable({ products, onEdit, onDelete }: ProductTableProps) 
               <th className="text-right px-4 py-3 text-xs font-semibold text-[#8b5e4a] uppercase tracking-wider">
                 <SortableHeader field="sold" label="Vendidos" />
               </th>
+              
               <th className="text-right px-4 py-3 text-xs font-semibold text-[#8b5e4a] uppercase tracking-wider">
                 Acciones
               </th>
@@ -139,7 +198,6 @@ export function ProductTable({ products, onEdit, onDelete }: ProductTableProps) 
                 ((product.price - product.costPrice) / product.price) * 100
               );
               const isLowStock = product.stock <= 5;
-
               return (
                 <tr
                   key={product.id}
@@ -153,7 +211,7 @@ export function ProductTable({ products, onEdit, onDelete }: ProductTableProps) 
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-xl overflow-hidden shrink-0 relative">
                         <Image
-                          src={product.imageUrl}
+                          src={product.imageUrl || "/placeholder-product.svg"}
                           alt={product.name}
                           fill
                           className="object-cover"
@@ -215,19 +273,42 @@ export function ProductTable({ products, onEdit, onDelete }: ProductTableProps) 
                   {/* Actions */}
                   <td className="px-4 py-3 text-right">
                     <div className="flex items-center justify-end gap-1">
+                      {/* Activa y desactiva un producto */}
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className={`h-8 w-8 rounded-lg ${
+                          product.active 
+                            ? "hover:bg-blue-50 hover:text-blue-600" 
+                            : "hover:bg-gray-100 hover:text-gray-600 text-gray-400"
+                        }`}
+                        onClick={() => handleToggleProduct(product)}
+                        disabled={isTogglingProduct === product.id}
+                        title={product.active ? "Desactivar producto" : "Activar producto"}
+                      >
+                        {isTogglingProduct === product.id ? (
+                          <ToggleRight className="w-8 h-5 animate-pulse" />
+                        ) : product.active ? (
+                          <ToggleRight className="w-8 h-5" />
+                        ) : (
+                          <ToggleLeft className="w-8 h-5" />
+                        )}
+                      </Button>
+                      {/* Editar producto */}
                       <Button
                         variant="ghost"
                         size="icon"
                         className="h-8 w-8 rounded-lg hover:bg-blue-50 hover:text-blue-600"
                         onClick={() => onEdit(product)}
                       >
-                        <Pencil className="w-3.5 h-3.5" />
+                        <Pencil className="w-5 h-3.5" />
                       </Button>
+                      {/* Eliminar producto */}
                       <Button
                         variant="ghost"
                         size="icon"
                         className="h-8 w-8 rounded-lg hover:bg-red-50 hover:text-red-600"
-                        onClick={() => onDelete(product.id)}
+                        onClick={() => handleDeleteClick(product)}
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </Button>
@@ -249,7 +330,7 @@ export function ProductTable({ products, onEdit, onDelete }: ProductTableProps) 
           return (
             <div key={product.id} className="p-4 flex items-start gap-3">
               <div className="w-14 h-14 rounded-xl overflow-hidden shrink-0 relative">
-                <Image src={product.imageUrl} alt={product.name} fill className="object-cover" sizes="56px" />
+                <Image src={product.imageUrl || "/placeholder-product.svg"} alt={product.name} fill className="object-cover" sizes="56px" />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="font-medium text-[#2c1810] text-sm leading-tight">{product.name}</p>
@@ -263,10 +344,40 @@ export function ProductTable({ products, onEdit, onDelete }: ProductTableProps) 
                 </div>
               </div>
               <div className="flex flex-col gap-1">
-                <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg" onClick={() => onEdit(product)}>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className={`h-8 w-8 rounded-lg ${
+                    product.active 
+                      ? "" 
+                      : "text-gray-400"
+                  }`}
+                  onClick={() => handleToggleProduct(product)}
+                  disabled={isTogglingProduct === product.id}
+                  title={product.active ? "Desactivar producto" : "Activar producto"}
+                >
+                  {isTogglingProduct === product.id ? (
+                    <ToggleRight className="w-5 h-5 animate-pulse" />
+                  ) : product.active ? (
+                    <ToggleRight className="w-5 h-5" />
+                  ) : (
+                    <ToggleLeft className="w-5 h-5" />
+                  )}
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 rounded-lg"
+                  onClick={() => onEdit(product)}
+                >
                   <Pencil className="w-3.5 h-3.5" />
                 </Button>
-                <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg hover:text-red-500" onClick={() => onDelete(product.id)}>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 rounded-lg hover:text-red-500"
+                  onClick={() => handleDeleteClick(product)}
+                >
                   <Trash2 className="w-3.5 h-3.5" />
                 </Button>
               </div>
@@ -281,6 +392,15 @@ export function ProductTable({ products, onEdit, onDelete }: ProductTableProps) 
           <p className="text-sm">No se encontraron productos</p>
         </div>
       )}
+
+      {/* Modal de confirmación de eliminación */}
+      <DeleteConfirmationModal
+        isOpen={deleteModalOpen}
+        product={selectedProductForDelete!}
+        onConfirm={handleConfirmDelete}
+        onCancel={handleCancelDelete}
+        isLoading={isDeleting}
+      />
     </div>
   );
 }

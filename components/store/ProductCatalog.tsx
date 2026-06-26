@@ -1,21 +1,47 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Search, SlidersHorizontal } from "lucide-react";
-import { PRODUCTS, CATEGORIES, type Product } from "@/constants/data";
+import { CATEGORIES } from "@/constants/data";
+
 import { ProductCard } from "@/components/store/ProductCard";
 import { ProductModal } from "@/components/store/ProductModal";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import { getProducts } from "@/app/services/products.service";
+import type { Product } from "@/lib/product";
 
 export function ProductCatalog() {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [activeCategory, setActiveCategory] = useState("all");
   const [search, setSearch] = useState("");
   const [sortBy, setSortBy] = useState<"featured" | "price-asc" | "price-desc" | "rating">("featured");
 
-  const filtered = PRODUCTS
+  // Obtener productos de la API al montar el componente
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const data = await getProducts();
+        setProducts(data);
+      } catch (err) {
+        console.error('Error al obtener productos:', err);
+        setError('No se pudieron cargar los productos. Intenta nuevamente.');
+        setProducts([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
+  const filtered = products
     .filter((p) => {
       const matchCat = activeCategory === "all" || p.category === activeCategory;
       const matchSearch =
@@ -107,15 +133,37 @@ export function ProductCatalog() {
         ))}
       </div>
 
+      {/* Loading state */}
+      {loading && (
+        <div className="text-center py-20">
+          <p className="text-[#8b5e4a] animate-pulse">Cargando productos...</p>
+        </div>
+      )}
+
+      {/* Error state */}
+      {error && (
+        <div className="text-center py-20">
+          <p className="text-red-600 mb-4">{error}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="text-sm text-[#c4883a] hover:underline"
+          >
+            Reintentar
+          </button>
+        </div>
+      )}
+
       {/* Count */}
-      <p className="text-sm text-[#8b5e4a] mb-6">
-        {filtered.length === 0
-          ? "No se encontraron productos"
-          : `${filtered.length} producto${filtered.length !== 1 ? "s" : ""}`}
-      </p>
+      {!loading && !error && (
+        <p className="text-sm text-[#8b5e4a] mb-6">
+          {filtered.length === 0
+            ? "No se encontraron productos"
+            : `${filtered.length} producto${filtered.length !== 1 ? "s" : ""}`}
+        </p>
+      )}
 
       {/* Grid */}
-      {filtered.length > 0 ? (
+      {!loading && !error && filtered.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {filtered.map((product, index) => (
             <ProductCard
@@ -126,7 +174,7 @@ export function ProductCatalog() {
             />
           ))}
         </div>
-      ) : (
+      ) : !loading && !error ? (
         <div className="text-center py-20">
           <p className="font-display text-4xl text-[#e8d5c0]">🍰</p>
           <p className="mt-4 text-[#8b5e4a]">No encontramos lo que buscas</p>
@@ -137,7 +185,7 @@ export function ProductCatalog() {
             Limpiar filtros
           </button>
         </div>
-      )}
+      ) : null}
 
       <ProductModal
         product={selectedProduct}

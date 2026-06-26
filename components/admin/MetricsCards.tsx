@@ -2,6 +2,7 @@
 
 import { DollarSign, TrendingUp, AlertTriangle, BarChart2 } from "lucide-react";
 import { getAdminMetrics } from "@/constants/data";
+// import { getAdminMetrics } from "@/lib/api";
 
 export function MetricsCards() {
   const metrics = getAdminMetrics();
