@@ -38,7 +38,7 @@ export function ProductFormModal({
           <div className="p-3">
             <ProductForm
               product={product}
-              // key={product?.id}
+              key={product?.id}
               onSave={onSave}
               onCancel={onCancel}
               />

@@ -23,7 +23,6 @@ import { cn } from "@/lib/utils";
 import { Product } from "@/lib/product";
 import { DeleteConfirmationModal } from "./DeleteConfirmationModal";
 import { deleteProduct, toggleProductStatus } from "@/app/services/products.service";
-// import { getProducts } from "@/app/services/products.service";
 
 interface ProductTableProps {
   products: Product[];

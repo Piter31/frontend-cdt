@@ -7,10 +7,8 @@ import { Product } from '@/lib/product';
 const mapBackendProduct = (backendProduct: any): Product => {
   // Mapear categorías del backend al frontend
   const categoryMap: Record<string, Product['category']> = {
-    'COOKIES': 'cookies',
-    'TARTAS': 'pies',
-    'PASTELES': 'cakes',
-    'FACTURAS': 'pastries',
+    'COOKIES & ALFAJORES': 'cookies & alfajores',
+    'TARTAS': 'tartas',
     'CHOCOLATES': 'chocolates',
     'OTROS': 'otros',
   };
@@ -40,10 +38,8 @@ const mapBackendProduct = (backendProduct: any): Product => {
 const mapFrontendProduct = (frontendProduct: Omit<Product, 'id'>) => {
   // Mapear categorías del frontend al backend
   const categoryMap: Record<string, string> = {
-    'cookies': 'COOKIES',
-    'pies': 'TARTAS',
-    'cakes': 'PASTELES',
-    'pastries': 'FACTURAS',
+    'cookies & alfajores': 'COOKIES & ALFAJORES',
+    'tartas': 'TARTAS',
     'chocolates': 'CHOCOLATES',
     'otros': 'OTROS',
   };

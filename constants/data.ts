@@ -1,21 +1,5 @@
-// export interface Product {
-//   id: string;
-//   name: string;
-//   description: string;
-//   shortDescription: string;
-//   price: number;
-//   costPrice: number;
-//   stock: number;
-//   sold: number;
-//   rating: number;
-//   reviewCount: number;
-//   imageUrl: string;
-//   category: "cookies" | "pies" | "cakes" | "pastries" | "chocolates";
-//   tags: string[];
-//   featured?: boolean;
-//   ingredients: string[];
-//   allergens: string[];
-// }
+import { Product } from "@/lib/product";
+
 
 export const PRODUCTS: Product[] = [
 //   // {
@@ -266,7 +250,5 @@ export const CATEGORIES = [
   { value: "all", label: "Todos" },
   { value: "cookies & alfajores", label: "Cookies & Alfajores" },
   { value: "tartas", label: "Tartas" },
-  // { value: "cakes", label: "Pasteles" },
-  // { value: "pastries", label: "Facturas" },
   { value: "chocolates", label: "Chocolates" },
 ];

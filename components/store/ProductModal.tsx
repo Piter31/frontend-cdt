@@ -107,7 +107,7 @@ export function ProductModal({ product, open, onOpenChange }: ProductModalProps)
         metodoPago: paymentMethod,
         items: [
           {
-            productId: product.id,
+            productId: product?.name,
             cantidad: quantity,
           },
         ],

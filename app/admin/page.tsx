@@ -258,7 +258,7 @@ export default function AdminPage() {
             onEdit={handleEdit}
             onDelete={handleDelete}
             onToggle={handleToggle}
-            // key={product.id}
+            // key={Product.id}
             />
           )}
           {/* {products.map((product) => (
