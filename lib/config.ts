@@ -11,7 +11,7 @@ export const WHATSAPP_NUMBER = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "+549X
 export const BUSINESS_NAME = "Corazón de Trufa";
 
 // URL de la tienda
-export const STORE_URL = process.env.NEXT_PUBLIC_STORE_URL || "http://localhost:3000";
+// export const STORE_URL = process.env.NEXT_PUBLIC_STORE_URL || "http://localhost:3000";
 
 // API Base URL
-export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+// export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";

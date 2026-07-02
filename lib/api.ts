@@ -9,7 +9,8 @@
 import axios from 'axios';
 
 export const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000',
+  baseURL: 'https://corazon-trufa-api-production.up.railway.app'
+  // baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000',
 })
 
 // const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001/api/v1';
