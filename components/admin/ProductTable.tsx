@@ -16,7 +16,6 @@ import {
   LucideTrash2,
   ToggleLeft,
   ToggleRight,
-  Key,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
